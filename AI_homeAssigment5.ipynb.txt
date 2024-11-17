@@ -1,0 +1,54 @@
+# Home Assignment (Shameen-101)
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+
+# Creating the dataset
+data = {
+    "Gender": ["Male", "Female", "Male", "Female", "Male", "Female", "Male", "Female", "Male", "Female"],
+    "Age": [25, 30, 45, 28, 35, 40, 50, 32, 29, 48],
+    "Physical Activity Level": [3, 2, 1, 3, 2, 1, 1, 2, 3, 1],
+    "Stress Level": [2, 3, 4, 1, 2, 4, 3, 2, 2, 4],
+    "Alcohol Consumption": ["Low", "Moderate", "High", "Low", "Moderate", "High", "High", "Low", "Moderate", "High"],
+    "Smoking Habit": ["No", "No", "Yes", "No", "No", "Yes", "Yes", "No", "No", "Yes"],
+    "Work Hours": [8, 9, 10, 7, 8, 9, 10, 8, 8, 9],
+    "Sleep Disorder": ["Yes", "No", "Yes", "No", "No", "Yes", "Yes", "No", "No", "Yes"]
+}
+
+# Converting the dataset into a DataFrame
+df = pd.DataFrame(data)
+
+# Encoding categorical variables
+label_encoders = {}
+categorical_columns = ["Gender", "Alcohol Consumption", "Smoking Habit", "Sleep Disorder"]
+
+for col in categorical_columns:
+    le = LabelEncoder()
+    df[col] = le.fit_transform(df[col])
+    label_encoders[col] = le  # Save the encoder for later use
+
+# Splitting features and labels
+X = df.drop(columns=["Sleep Disorder"])  # Features
+y = df["Sleep Disorder"]                # Labels
+
+# Splitting into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Training the Decision Tree Classifier
+classifier = DecisionTreeClassifier(random_state=42)
+classifier.fit(X_train, y_train)
+
+# Making predictions
+y_pred = classifier.predict(X_test)
+
+# Evaluating the model
+conf_matrix = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+
+# Displaying results
+print("Confusion Matrix:")
+print(conf_matrix)
+print("\nAccuracy:", accuracy)

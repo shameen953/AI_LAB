@@ -1,0 +1,205 @@
+#Task 01 
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Load the dataset (replace with your data based on Table 1 structure)
+data = {
+    'Gender': ['male', 'male', 'male', 'male', 'female', 'female', 'female', 'female'],
+    'Height': [6.00, 5.92, 5.58, 5.92, 5.00, 5.50, 5.42, 5.75],
+    'Weight': [180, 190, 170, 165, 100, 150, 130, 150],
+    'Foot_size': [12, 11, 12, 10, 6, 8, 7, 9]
+}
+df = pd.DataFrame(data)
+print(df)
+print('\n')
+
+# Split features and labels
+features = df[['Height', 'Weight', 'Foot_size']]
+labels = df['Gender']
+
+# Initialize and train Decision Tree Classifier
+classifier = DecisionTreeClassifier()
+classifier.fit(features, labels)
+
+# New entry for prediction (make it a DataFrame with column names)
+new_entry = pd.DataFrame([[6.21, 160, 9]], columns=['Height', 'Weight', 'Foot_size'])
+prediction = classifier.predict(new_entry)
+print("Prediction for new entry:", prediction)
+
+# Confusion Matrix and Accuracy Score
+predicted_labels = classifier.predict(features)
+conf_matrix = confusion_matrix(labels, predicted_labels)
+accuracy = accuracy_score(labels, predicted_labels)
+
+print("Confusion Matrix:\n", conf_matrix)
+print("Accuracy Score:", accuracy)
+
+
+
+#Task 02
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import confusion_matrix, accuracy_score
+
+# Initial dataset (Table 1)
+data = {
+    'Gender': ['male', 'male', 'male', 'male', 'female', 'female', 'female', 'female'],  
+    'Height': [6.00, 5.92, 5.58, 5.92, 5.00, 5.50, 5.42, 5.75],  
+    'Weight': [180, 190, 170, 165, 100, 150, 130, 150], 
+    'Foot_size': [12, 11, 12, 10, 6, 8, 7, 9] 
+}
+
+# Convert the data into a pandas DataFrame
+df = pd.DataFrame(data)
+
+# Split features and labels
+features = df[['Height', 'Weight', 'Foot_size']]
+labels = df['Gender']
+
+# Initialize the Decision Tree Classifier
+classifier = DecisionTreeClassifier()
+
+# Train the classifier on the initial dataset
+classifier.fit(features, labels)
+
+# New entry for prediction (this is the data point we want to predict and add to the dataset)
+new_entry = [[6.00, 180, 12]]
+
+# Predict the label for the new entry
+new_entry_prediction = classifier.predict(new_entry)
+print("Prediction for the new entry:", new_entry_prediction)
+
+# Add the new entry with its predicted label to the dataset
+new_entry_data = {'Height': 6.00, 'Weight': 180, 'Foot_size': 12, 'Gender': new_entry_prediction[0]}
+df = df.append(new_entry_data, ignore_index=True)
+
+# Split features and labels again (to include the new data)
+features = df[['Height', 'Weight', 'Foot_size']]
+labels = df['Gender']
+
+# Retrain the classifier with the updated dataset
+classifier.fit(features, labels)
+
+# Confusion Matrix and Accuracy Score with the updated model
+predicted_labels = classifier.predict(features)
+conf_matrix = confusion_matrix(labels, predicted_labels)
+accuracy = accuracy_score(labels, predicted_labels)
+
+# Display the confusion matrix and accuracy score
+print("Updated Confusion Matrix:\n", conf_matrix)
+print("Updated Accuracy Score:", accuracy)
+
+# Print the updated dataset
+print("\nUpdated Dataset:")
+print(df)
+
+
+
+#Task 03
+import numpy as np
+
+# Sample dataset (Table 1)
+# Gender: 'male', 'female'
+# Features: Height, Weight, Foot_size
+data = np.array([
+    ['male', 6.00, 180, 12],
+    ['male', 5.92, 190, 11],
+    ['male', 5.58, 170, 12],
+    ['male', 5.92, 165, 10],
+    ['female', 5.00, 100, 6],
+    ['female', 5.50, 150, 8],
+    ['female', 5.42, 130, 7],
+    ['female', 5.75, 150, 9]
+])
+
+# Encoding the categorical target labels ('male', 'female')
+# 'male' -> 0, 'female' -> 1
+gender_map = {'male': 0, 'female': 1}
+data[:, 0] = [gender_map[x] for x in data[:, 0]]
+
+# Features: Height, Weight, Foot_size
+X = data[:, 1:].astype(float)  # All rows, columns 1, 2, 3 (Height, Weight, Foot_size)
+y = data[:, 0].astype(int)     # All rows, first column (Gender)
+
+# Function to calculate the entropy of a dataset
+def entropy(y):
+    class_labels, class_counts = np.unique(y, return_counts=True)
+    probabilities = class_counts / len(y)
+    return -np.sum(probabilities * np.log2(probabilities))
+
+# Function to calculate the information gain from splitting on a feature
+def information_gain(X_column, y):
+    # Calculate entropy before the split
+    entropy_before = entropy(y)
+    
+    # Get unique values of the feature (i.e., all possible splits)
+    unique_values = np.unique(X_column)
+    
+    weighted_entropy = 0
+    for value in unique_values:
+        # Subset of the data where the feature equals the current value
+        y_subset = y[X_column == value]
+        weighted_entropy += (len(y_subset) / len(y)) * entropy(y_subset)
+    
+    # Information Gain is the difference in entropy before and after the split
+    return entropy_before - weighted_entropy
+
+# Function to find the best feature to split on (the one with the highest information gain)
+def best_split(X, y):
+    best_feature = -1
+    best_gain = -1
+    
+    for feature_index in range(X.shape[1]):  # Iterate through all features
+        gain = information_gain(X[:, feature_index], y)
+        if gain > best_gain:
+            best_gain = gain
+            best_feature = feature_index
+    
+    return best_feature
+
+# Function to build the decision tree recursively
+def build_tree(X, y):
+    if len(np.unique(y)) == 1:  # If all labels are the same, return that label
+        return np.unique(y)[0]
+    
+    if X.shape[1] == 0:  # If no features left to split on, return the most common label
+        return np.argmax(np.bincount(y))
+    
+    best_feature = best_split(X, y)
+    
+    tree = {best_feature: {}}
+    unique_values = np.unique(X[:, best_feature])
+    
+    for value in unique_values:
+        # Subset the data where the best feature equals the current value
+        subset_X = X[X[:, best_feature] == value]
+        subset_y = y[X[:, best_feature] == value]
+        subtree = build_tree(subset_X, subset_y)
+        tree[best_feature][value] = subtree
+    
+    return tree
+
+# Function to make predictions using the decision tree
+def predict(tree, X):
+    if isinstance(tree, int):  # If it's a leaf node
+        return tree
+    
+    feature_index = list(tree.keys())[0]  # Get the feature index to split on
+    feature_value = X[feature_index]  # Get the value of the feature
+    
+    if feature_value not in tree[feature_index]:
+        return np.random.choice([0, 1])  # Random prediction if value is not in tree
+    
+    return predict(tree[feature_index][feature_value], X)
+
+# Build the decision tree using the dataset
+tree = build_tree(X, y)
+print("Decision Tree:", tree)
+
+# Predict for a new entry (e.g., [6.00, 180, 12])
+new_entry = np.array([6.00, 180, 12])
+prediction = predict(tree, new_entry)
+print(f"Prediction for new entry: {'male' if prediction == 0 else 'female'}")
+ 
+
