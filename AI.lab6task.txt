@@ -1,0 +1,84 @@
+#Task 01 
+
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Step 1: Create the dataset directly in the code
+data = {
+    'area': [2600, 3000, 3200, 3600, 4000],
+    'price': [550000, 565000, 610000, 680000, 725000]
+}
+
+# Convert to a DataFrame
+df = pd.DataFrame(data)
+
+# Display the dataset
+print("Dataset:")
+print(df)
+
+# Step 2: Define the independent variable (X) and the dependent variable (y)
+X = df[['area']]  # Feature: area
+y = df['price']   # Target: price
+
+# Step 3: Create and train the Linear Regression model
+model = LinearRegression()
+model.fit(X, y)
+
+# Step 4: Display the model parameters
+print("\nModel Coefficient (Slope):", model.coef_[0])
+print("Model Intercept:", model.intercept_)
+
+# Step 5: Predict prices for the given areas
+predictions = model.predict(X)
+print("\nPredicted Prices for the given areas:")
+for area, price in zip(df['area'], predictions):
+    print(f"Area: {area} sq.ft => Predicted Price: ${price:.2f}")
+
+# Step 6: Predict the price for a new area (e.g., 3300 sq.ft)
+new_area = [[3300]]  # New area input
+predicted_price = model.predict(new_area)
+print(f"\nPredicted Price for 3300 sq.ft: ${predicted_price[0]:.2f}")
+
+
+#Task 02 
+
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Step 1: Create the dataset directly in the code
+data = {
+    'area': [2600, 3000, 3200, 3600, 4000],
+    'price': [550000, 565000, 610000, 680000, 725000]
+}
+
+# Convert to a DataFrame
+df = pd.DataFrame(data)
+
+# Display the dataset
+print("Dataset:")
+print(df)
+
+# Step 2: Define the independent variable (X) and the dependent variable (y)
+X = df[['area']]  # Feature: area
+y = df['price']   # Target: price
+
+# Step 3: Create and train the Linear Regression model
+model = LinearRegression()
+model.fit(X, y)
+
+# Step 4: Display the model parameters
+print("\nModel Coefficient (Slope):", model.coef_[0])
+print("Model Intercept:", model.intercept_)
+
+# Step 5: Predict prices for the given areas
+predictions = model.predict(X)
+print("\nPredicted Prices for the given areas:")
+for area, price in zip(df['area'], predictions):
+    print(f"Area: {area} sq.ft => Predicted Price: ${price:.2f}")
+
+# Step 6: Predict the price for a new area (e.g., 3300 sq.ft)
+new_area = [[3300]]  # New area input
+predicted_price = model.predict(new_area)
+print(f"\nPredicted Price for 3300 sq.ft: ${predicted_price[0]:.2f}")
+
+
