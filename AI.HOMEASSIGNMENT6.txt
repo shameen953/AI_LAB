@@ -1,0 +1,144 @@
+LAB 6
+
+#Home Assignment 1 
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = {
+    "InvoiceNo": [536365, 536365, 536366, 536367, 536367, 536368, 536369, 536370],
+    "Description": [
+        "WHITE HANGING HEART", "WHITE METAL LANTERN", "CREAM CUPID HEARTS",
+        "RED WOOLLY HOTTIE", "SET OF 6 SPICE TINS", "PACK OF 72 RETRO",
+        "GLASS STAR FROSTED", "HAND WARMER RED POL"
+    ],
+    "Quantity": [6, 6, 8, 6, 6, 24, 6, 12],
+    "InvoiceDate": [
+        "2010-12-01 08:26:00", "2010-12-01 08:26:00", "2010-12-01 08:28:00",
+        "2010-12-01 08:34:00", "2010-12-01 08:34:00", "2010-12-01 08:35:00",
+        "2010-12-01 08:45:00", "2010-12-01 08:50:00"
+    ],
+    "UnitPrice": [2.55, 3.39, 1.85, 3.39, 4.25, 5.95, 4.25, 2.10],
+    "CustomerID": [17850, 17850, 13047, 12583, 12583, 17548, 12431, 14045],
+    "Country": ["France", "France", "Germany", "France", "France", "Spain", "France", "France"]
+}
+df = pd.DataFrame(data)
+
+# Extract numerical columns for clustering
+X = df[['Quantity', 'UnitPrice']]
+
+# Normalize the data
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Apply K-means clustering
+kmeans = KMeans(n_clusters=2, random_state=42)
+df['Cluster'] = kmeans.fit_predict(X_scaled)
+
+# Display the clustering results
+print(df[['InvoiceNo', 'Description', 'Cluster']])
+
+# Visualize the clusters
+plt.scatter(df['Quantity'], df['UnitPrice'], c=df['Cluster'], cmap='viridis')
+plt.xlabel('Quantity')
+plt.ylabel('UnitPrice')
+plt.title('K-means Clustering (2 clusters)')
+plt.show()
+
+#Home Assignment 2 
+import pandas as pd
+from itertools import combinations
+
+# Sample Data
+data = {
+    "InvoiceNo": [536365, 536365, 536366, 536367, 536367, 536368, 536369, 536370],
+    "Description": [
+        "WHITE HANGING HEART", "WHITE METAL LANTERN", "CREAM CUPID HEARTS",
+        "RED WOOLLY HOTTIE", "SET OF 6 SPICE TINS", "PACK OF 72 RETRO",
+        "GLASS STAR FROSTED", "HAND WARMER RED POL"
+    ],
+    "Quantity": [6, 6, 8, 6, 6, 24, 6, 12],
+    "InvoiceDate": [
+        "2010-12-01 08:26:00", "2010-12-01 08:26:00", "2010-12-01 08:28:00",
+        "2010-12-01 08:34:00", "2010-12-01 08:34:00", "2010-12-01 08:35:00",
+        "2010-12-01 08:45:00", "2010-12-01 08:50:00"
+    ],
+    "UnitPrice": [2.55, 3.39, 1.85, 3.39, 4.25, 5.95, 4.25, 2.10],
+    "CustomerID": [17850, 17850, 13047, 12583, 12583, 17548, 12431, 14045],
+    "Country": ["France", "France", "Germany", "France", "France", "Spain", "France", "France"]
+}
+
+df = pd.DataFrame(data)
+
+# Step 1: Create a transaction list
+transactions = df.groupby('InvoiceNo')['Description'].apply(list).tolist()
+
+# Debug: Print transactions to verify correctness
+print("Transactions:")
+for t in transactions:
+    print(t)
+
+# Step 2: Define a function to calculate the support of an itemset
+def calculate_support(itemset, transactions):
+    count = sum(1 for transaction in transactions if set(itemset).issubset(transaction))
+    return count / len(transactions)
+
+# Step 3: Generate frequent itemsets
+min_support = 0.3  # Minimum support threshold
+frequent_itemsets = []
+items = [item for transaction in transactions for item in transaction]
+itemsets = list(combinations(set(items), 1))  # Start with single itemsets
+
+# Find frequent itemsets of size 1
+for itemset in itemsets:
+    support = calculate_support(itemset, transactions)
+    if support >= min_support:
+        frequent_itemsets.append((itemset, support))
+
+# Debug: Print frequent itemsets of size 1
+print("\nFrequent Itemsets of Size 1:")
+for itemset, support in frequent_itemsets:
+    print(f"Itemset: {itemset}, Support: {support:.2f}")
+
+# Find frequent itemsets of size 2
+itemsets_size_2 = list(combinations(set(items), 2))
+for itemset in itemsets_size_2:
+    support = calculate_support(itemset, transactions)
+    if support >= min_support:
+        frequent_itemsets.append((itemset, support))
+
+# Debug: Print frequent itemsets of size 2
+print("\nFrequent Itemsets of Size 2:")
+for itemset, support in frequent_itemsets:
+    print(f"Itemset: {itemset}, Support: {support:.2f}")
+
+# Step 4: Generate association rules
+def generate_rules(frequent_itemsets, transactions, min_confidence):
+    rules = []
+    for itemset, support in frequent_itemsets:
+        if len(itemset) > 1:  # Only consider itemsets larger than 1 for rules
+            for i in range(1, len(itemset)):
+                antecedents = list(combinations(itemset, i))
+                for antecedent in antecedents:
+                    consequent = tuple(set(itemset) - set(antecedent))
+                    # Calculate confidence
+                    antecedent_support = calculate_support(antecedent, transactions)
+                    if antecedent_support > 0:
+                        confidence = support / antecedent_support
+                        if confidence >= min_confidence:
+                            rules.append((antecedent, consequent, confidence, support))
+    return rules
+
+# Step 5: Get association rules
+min_confidence = 0.6  # Minimum confidence threshold
+rules = generate_rules(frequent_itemsets, transactions, min_confidence)
+
+# Debug: Print association rules
+print("\nAssociation Rules:")
+if rules:
+    for antecedent, consequent, confidence, support in rules:
+        print(f"Rule: {antecedent} -> {consequent}, Confidence: {confidence:.2f}, Support: {support:.2f}")
+else:
+    print("No association rules generated.")

@@ -1,0 +1,186 @@
+LAB 06
+
+#Task 1 
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = {
+    "Age": [25, 45, 35, 50, 23, 40, 30, 60, 28, 38],
+    "Income($)": [40000, 80000, 60000, 100000, 20000, 90000, 70000, 120000, 30000, 75000],
+    "Spending_Score": [30, 50, 40, 60, 10, 70, 50, 80, 20, 55]
+}
+df = pd.DataFrame(data)
+
+# Apply K-Means Clustering with K=3
+kmeans = KMeans(n_clusters=3, random_state=42)
+df['Cluster'] = kmeans.fit_predict(df[['Age', 'Income($)', 'Spending_Score']])
+
+# Display centroids
+centroids = kmeans.cluster_centers_
+print("Centroids:")
+print(centroids)
+
+# Visualize the clusters
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Age'], df['Income($)'], c=df['Cluster'], cmap='viridis', s=100, marker='o', label='Data Points')
+plt.scatter(centroids[:, 0], centroids[:, 1], s=300, c='red', marker='X', label='Centroids')
+plt.xlabel('Age')
+plt.ylabel('Income($)')
+plt.title('K-Means Clustering (Age vs Income)')
+plt.legend()
+plt.show()
+
+# Visualizing clusters with Spending Score
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Income($)'], df['Spending_Score'], c=df['Cluster'], cmap='viridis', s=100, marker='o', label='Data Points')
+plt.scatter(centroids[:, 1], centroids[:, 2], s=300, c='red', marker='X', label='Centroids')
+plt.xlabel('Income($)')
+plt.ylabel('Spending Score')
+plt.title('K-Means Clustering (Income vs Spending Score)')
+plt.legend()
+plt.show()
+
+
+#Task 2
+import numpy as np
+
+# Sample dataset
+data = np.array([
+    [1.0, 2.0, 1.0],
+    [1.5, 1.8, 2.0],
+    [5.0, 8.0, 6.0],
+    [8.0, 8.0, 5.0],
+    [1.0, 0.6, 1.5],
+    [9.0, 11.0, 8.0],
+    [8.0, 2.0, 7.0],
+    [10.0, 2.0, 6.0],
+])
+
+# Apply K-Means Clustering
+kmeans = KMeans(n_clusters=2, random_state=0)
+labels = kmeans.fit_predict(data)
+centroids = kmeans.cluster_centers_
+
+print("Cluster labels for objects:")
+print(labels)
+print("Centroids:")
+print(centroids)
+
+
+#Task 3 
+import pandas as pd
+from sklearn.cluster import KMeans
+import matplotlib.pyplot as plt
+
+# Load the dataset
+data = {
+    'Objects': ['OB-1', 'OB-2', 'OB-3', 'OB-4', 'OB-5', 'OB-6', 'OB-7', 'OB-8'],
+    'X': [1, 1, 1, 2, 1, 2, 1, 2],
+    'Y': [4, 2, 4, 1, 1, 4, 1, 1],
+    'Z': [1, 2, 2, 2, 1, 2, 2, 1]
+}
+df = pd.DataFrame(data)
+
+# Apply K-Means Clustering with K=3
+kmeans = KMeans(n_clusters=3, random_state=42)
+df['Cluster'] = kmeans.fit_predict(df[['X', 'Y', 'Z']])
+
+# Display cluster centroids
+centroids = kmeans.cluster_centers_
+print("Centroids:")
+print(centroids)
+
+# Visualize the clusters (X vs. Y)
+plt.figure(figsize=(8, 6))
+plt.scatter(df['X'], df['Y'], c=df['Cluster'], cmap='viridis', s=100, label='Data Points')
+plt.scatter(centroids[:, 0], centroids[:, 1], s=300, c='red', marker='X', label='Centroids')
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('K-Means Clustering (X vs Y)')
+plt.legend()
+plt.show()
+
+# Visualize the clusters (Y vs. Z)
+plt.figure(figsize=(8, 6))
+plt.scatter(df['Y'], df['Z'], c=df['Cluster'], cmap='viridis', s=100, label='Data Points')
+plt.scatter(centroids[:, 1], centroids[:, 2], s=300, c='red', marker='X', label='Centroids')
+plt.xlabel('Y')
+plt.ylabel('Z')
+plt.title('K-Means Clustering (Y vs Z)')
+plt.legend()
+plt.show()
+
+
+
+#Task 4 
+import pandas as pd
+from itertools import combinations
+
+# Step 1: Load the dataset
+data = {
+    'Objects': ['OB-1', 'OB-2', 'OB-3', 'OB-4', 'OB-5', 'OB-6', 'OB-7', 'OB-8'],
+    'X': [1, 1, 1, 2, 1, 2, 1, 2],
+    'Y': [4, 2, 4, 1, 1, 4, 1, 1],
+    'Z': [1, 2, 2, 2, 1, 2, 2, 1]
+}
+df = pd.DataFrame(data)
+
+# Step 2: Preprocess the dataset (convert values to binary)
+df_apriori = df.copy()
+df_apriori['X'] = (df_apriori['X'] >= 2).astype(int)
+df_apriori['Y'] = (df_apriori['Y'] >= 2).astype(int)
+df_apriori['Z'] = (df_apriori['Z'] >= 2).astype(int)
+df_apriori = df_apriori[['X', 'Y', 'Z']]
+
+# Step 3: Calculate frequent itemsets
+def generate_itemsets(transactions, min_support):
+    itemsets = {}
+    for row in transactions:
+        for item in row:
+            if item in itemsets:
+                itemsets[item] += 1
+            else:
+                itemsets[item] = 1
+    # Filter itemsets based on minimum support
+    itemsets = {k: v for k, v in itemsets.items() if v / len(transactions) >= min_support}
+    return itemsets
+
+def generate_combinations(itemsets, length):
+    items = list(itemsets.keys())
+    return list(combinations(items, length))
+
+transactions = df_apriori.apply(lambda row: [col for col in df_apriori.columns if row[col] == 1], axis=1).tolist()
+min_support = 0.3
+frequent_itemsets = generate_itemsets(transactions, min_support)
+print("Frequent Itemsets (Length 1):", frequent_itemsets)
+
+# Step 4: Generate association rules
+def generate_rules(itemsets, transactions, min_confidence):
+    rules = []
+    for itemset in itemsets:
+        for i in range(1, len(itemset)):
+            antecedents = list(combinations(itemset, i))
+            for antecedent in antecedents:
+                consequent = tuple(set(itemset) - set(antecedent))
+                if not consequent:
+                    continue
+                antecedent_count = sum(1 for t in transactions if set(antecedent).issubset(t))
+                itemset_count = sum(1 for t in transactions if set(itemset).issubset(t))
+                confidence = itemset_count / antecedent_count if antecedent_count > 0 else 0
+                if confidence >= min_confidence:
+                    rules.append({
+                        'antecedent': antecedent,
+                        'consequent': consequent,
+                        'confidence': confidence
+                    })
+    return rules
+
+min_confidence = 0.6
+rules = generate_rules(frequent_itemsets.keys(), transactions, min_confidence)
+print("\nAssociation Rules:")
+for rule in rules:
+    print(f"{rule['antecedent']} -> {rule['consequent']}, Confidence: {rule['confidence']:.2f}")
+
+
