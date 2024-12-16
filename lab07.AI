@@ -1,0 +1,218 @@
+#Task 01 
+import pandas as pd
+
+student_scores = {
+    'Student': ['Shameen', 'Sameed', 'Khadija', 'Huda'],
+    'Math': [95, None, 85, 78],
+    'English': [88, 92, None, 85],
+    'Science': [None, 75, 89, 90]
+}
+
+
+df = pd.DataFrame(student_scores)
+
+print("Original DataFrame:")
+print(df)
+
+df_ffill = df.ffill()
+
+print("\nDataFrame after forward fill:")
+print(df_ffill)
+
+#Task 02
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+# dataset
+data = {
+    'Previous_Score': [75, 85, 80, 95, 90, 88, 77, 92],
+    'Attendance': [85, 95, 90, 100, 80, 90, 88, 95],
+    'Current_Score': [80, 88, 85, 92, 89, 87, 78, 93]
+}
+df = pd.DataFrame(data)
+
+print("Dataset:")
+print(df)
+
+
+X = df[['Previous_Score', 'Attendance']]
+y = df['Current_Score']
+
+# Split data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+
+print("\nTraining Data (X_train):")
+print(X_train)
+print("\nTesting Data (X_test):")
+print(X_test)
+
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+# Make predictions
+predictions = model.predict(X_test)
+
+print("\nPredictions:")
+print(predictions)
+print("\nActual Values (y_test):")
+print(y_test.values)
+print("\nMean Squared Error:", mean_squared_error(y_test, predictions))
+
+#Task 03 (Shameen-101)
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+
+data = {
+    'Credit_History': [1, 0, 1, 1, 0, 1, 0, 0, 1, 1],
+    'Income': [5000, 2000, 4000, 6000, 1500, 5500, 1800, 2200, 5200, 5800],
+    'Loan_Status': ['Low Risk', 'High Risk', 'Low Risk', 'Low Risk', 'High Risk', 
+                    'Low Risk', 'High Risk', 'High Risk', 'Low Risk', 'Low Risk']
+}
+df = pd.DataFrame(data)
+
+X = df[['Credit_History', 'Income']]  # Input features
+y = df['Loan_Status']                # Target variable
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train Decision Tree Classifier
+model = DecisionTreeClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+predictions = model.predict(X_test)
+
+print("\nClassification Report:")
+print(classification_report(y_test, predictions))
+
+#Task 04 (Shameen-101)
+import pandas as pd
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import classification_report
+
+data = {
+    'Email_Text': [
+        "Win $1000 cash now!",  
+        "Meeting at 3 PM tomorrow",  
+        "Exclusive offer just for you",  
+        "Can we reschedule our meeting?",  
+        "Get cheap loans today", 
+        "Project deadline is next week",  
+        "Congratulations! You won a free vacation!",  
+        "Let's connect over coffee tomorrow"  
+    ],
+    'Label': ['spam', 'not spam', 'spam', 'not spam', 'spam', 'not spam', 'spam', 'not spam']
+}
+
+df = pd.DataFrame(data)
+
+
+X = df['Email_Text']
+y = df['Label']
+
+# Convert text into numerical data using CountVectorizer
+vectorizer = CountVectorizer()
+X_transformed = vectorizer.fit_transform(X)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X_transformed, y, test_size=0.3, random_state=42, stratify=y
+)
+# Train Naive Bayes classifier
+model = MultinomialNB()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+print("\nClassification Report:")
+print(classification_report(y_test, predictions, zero_division=1))
+
+#Task 05 (Shameen-101)
+import pandas as pd
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix
+data = {
+    'Symptom1': [1, 0, 1, 1, 0, 0, 1, 0, 1, 1],
+    'Symptom2': [0, 1, 0, 1, 0, 1, 1, 0, 0, 1],
+    'Diagnosis': ['Disease A', 'Disease B', 'Disease A', 'Disease A', 'Disease B',
+                  'Disease B', 'Disease A', 'Disease B', 'Disease A', 'Disease A']
+}
+
+df = pd.DataFrame(data)
+
+# Features and target
+X = df[['Symptom1', 'Symptom2']]
+y = df['Diagnosis']
+
+# Stratified train-test split
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=42, stratify=y
+)
+
+# Train Decision Tree Classifier
+model = DecisionTreeClassifier(random_state=42)
+model.fit(X_train, y_train)
+
+predictions = model.predict(X_test)
+
+accuracy = accuracy_score(y_test, predictions)
+precision = precision_score(y_test, predictions, pos_label='Disease A')
+recall = recall_score(y_test, predictions, pos_label='Disease A')
+f1 = f1_score(y_test, predictions, pos_label='Disease A')
+conf_matrix = confusion_matrix(y_test, predictions)
+
+print(f"Accuracy: {accuracy:.2f}")
+print(f"Precision (Disease A): {precision:.2f}")
+print(f"Recall (Disease A): {recall:.2f}")
+print(f"F1-Score (Disease A): {f1:.2f}")
+
+print("\nConfusion Matrix:")
+print(conf_matrix)
+
+
+#Task 06 (Shameen-101)
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
+
+
+data = {
+    'Size': [1500, 1800, 2400, 3000, 3500, 4000, 4500, 5000, 5500, 6000],  # in square feet
+    'Rooms': [3, 4, 4, 5, 5, 6, 6, 7, 7, 8],
+    'Age': [10, 15, 20, 5, 10, 15, 20, 5, 2, 8],  # in years
+    'Price': [400000, 450000, 500000, 600000, 650000, 700000, 750000, 800000, 850000, 900000]  # in dollars
+}
+
+df = pd.DataFrame(data)
+
+X = df[['Size', 'Rooms', 'Age']]
+y = df['Price']
+
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Initialize and train the Linear Regression model
+model = LinearRegression()
+model.fit(X_train, y_train)
+
+
+y_pred = model.predict(X_test)
+
+
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+
+
+print(f"Mean Squared Error: {mse}")
+print(f"R² Score: {r2}")
+
+# Displaying predicted vs actual prices
+predicted_vs_actual = pd.DataFrame({'Actual': y_test, 'Predicted': y_pred})
+print("\nPredicted vs Actual Prices:")
+print(predicted_vs_actual)
