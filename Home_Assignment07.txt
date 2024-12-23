@@ -1,0 +1,48 @@
+#HOME TASK 
+import pandas as pd
+import numpy as np
+
+ratings_dict = {
+    "item": ["Action", "Comedy", "Drama", "Romance", "Sci-Fi"],
+    "A": [5, 3, 2, 1, 4],
+    "B": [4, 2, 5, 1, 5],
+    "C": [3, 4, 1, 5, 2],
+    "D": [2, 3, 5, 4, 1],
+    "E": [1, 5, 4, 2, 3],
+}
+
+df = pd.DataFrame(ratings_dict).set_index("item")
+
+def cosine_similarity(matrix):
+    norm = np.linalg.norm(matrix, axis=0) + 1e-8
+    similarity = np.dot(matrix.T, matrix) / (norm[:, None] * norm[None, :])
+    return pd.DataFrame(similarity, index=matrix.columns, columns=matrix.columns)
+
+item_similarity = cosine_similarity(df)
+
+def recommend_genres(user_id, all_items, item_similarity, ratings):
+    recommendations = []
+    user_ratings = ratings[user_id]
+    
+    for item_id in all_items:
+        if user_ratings[item_id] == 0:
+            sim_scores = item_similarity.loc[item_id, user_ratings[user_ratings > 0].index]
+            rated_items = user_ratings[user_ratings > 0]
+            
+            if sim_scores.sum() > 0:
+                predicted_rating = (sim_scores * rated_items).sum() / sim_scores.sum()
+            else:
+                predicted_rating = ratings[item_id].mean()
+            
+            recommendations.append((item_id, predicted_rating))
+    
+    recommendations.sort(key=lambda x: x[1], reverse=True)
+    return recommendations
+
+all_items = df.index
+user_id = 'E'
+recommendations = recommend_genres(user_id, all_items, item_similarity, df)
+
+print(f"Recommended genres for user {user_id}:")
+for idx, (item_id, predicted_rating) in enumerate(recommendations, start=1):
+    print(f"Genre {item_id}: Predicted Rating {predicted_rating:.2f}")
