@@ -1,0 +1,44 @@
+#LAB TASK 
+import pandas as pd
+from surprise import Dataset, Reader
+from surprise import KNNWithMeans
+
+ratings_dict = {
+    "item": [1, 2, 1, 2, 1, 2, 1, 2, 1],
+    "user": ['A', 'A', 'B', 'B', 'C', 'C', 'D', 'D', 'E'],
+    "rating": [1, 2, 2, 4, 2.5, 4, 4.5, 5, 3],
+}
+
+df = pd.DataFrame(ratings_dict)
+
+reader = Reader(rating_scale=(1, 5))
+data = Dataset.load_from_df(df[["user", "item", "rating"]], reader)
+
+sim_options = {
+    "name": "cosine",  # Use cosine similarity
+    "user_based": False,  # Item-based collaborative filtering
+}
+
+algo = KNNWithMeans(sim_options=sim_options)
+
+trainingSet = data.build_full_trainset()
+
+algo.fit(trainingSet)
+
+def recommend_movies(user_id, all_items, algo):
+    recommendations = []
+    for item_id in all_items:
+        prediction = algo.predict(user_id, item_id)
+        recommendations.append((item_id, prediction.est))
+    recommendations.sort(key=lambda x: x[1], reverse=True)  # Sort by predicted rating
+    return recommendations
+
+all_items = df["item"].unique()
+
+user_id = 'E'
+
+recommendations = recommend_movies(user_id, all_items, algo)
+
+print(f"Recommended movies for user {user_id}:")
+for item_id, predicted_rating in recommendations:
+    print(f"Movie {item_id}: Predicted Rating {predicted_rating:.2f}"). 
