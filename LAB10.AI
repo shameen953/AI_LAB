@@ -1,0 +1,108 @@
+# Task 1
+names = ['Alice', 'Bob', 'Charlie']
+for name in names:
+    print(name)
+
+# Task 2
+guests = ['Albert Einstein', 'Marie Curie', 'Nikola Tesla']
+for guest in guests:
+    print(f"Dear {guest}, you are cordially invited to dinner.")
+
+# Task 3
+guests = ['Albert Einstein', 'Marie Curie', 'Nikola Tesla']
+print(f"Unfortunately, {guests[1]} cannot make it to dinner.")
+guests[1] = 'Ada Lovelace'
+for guest in guests:
+    print(f"Dear {guest}, you are cordially invited to dinner.")
+
+
+# Task 4
+class Employee:
+    emp_count = 0
+
+    def __init__(self, name, salary):
+        self.name = name
+        self.salary = salary
+        Employee.emp_count += 1
+
+    @staticmethod
+    def display_count():
+        print(f"Total Employees: {Employee.emp_count}")
+
+    def display_employee(self):
+        print(f"Name: {self.name}, Salary: {self.salary}")
+
+# Usage
+e1 = Employee("John", 50000)
+e2 = Employee("Jane", 60000)
+
+e1.display_employee()
+e2.display_employee()
+Employee.display_count()
+
+# Task 5
+from queue import LifoQueue
+
+lifo_queue = LifoQueue()
+lifo_queue.put(10)
+lifo_queue.put(20)
+lifo_queue.put(30)
+
+while not lifo_queue.empty():
+    print(lifo_queue.get())
+
+# Task 6
+import heapq
+
+priority_queue = []
+elements = [4, 8, 1, 7, 3]
+
+# Convert to max-priority by storing negative values
+for element in elements:
+    heapq.heappush(priority_queue, -element)
+
+# Retrieve elements to display priority order
+while priority_queue:
+    print(-heapq.heappop(priority_queue))
+
+
+# Task 7
+class Vertex:
+    def __init__(self, key):
+        self.key = key
+        self.neighbors = {}
+
+    def add_neighbor(self, neighbor, weight=0):
+        self.neighbors[neighbor] = weight
+
+    def get_neighbors(self):
+        return self.neighbors.keys()
+
+class Graph:
+    def __init__(self):
+        self.vertices = {}
+
+    def add_vertex(self, key):
+        vertex = Vertex(key)
+        self.vertices[key] = vertex
+
+    def add_edge(self, from_key, to_key, weight=0):
+        if from_key in self.vertices and to_key in self.vertices:
+            self.vertices[from_key].add_neighbor(to_key, weight)
+            self.vertices[to_key].add_neighbor(from_key, weight)
+
+    def display_graph(self):
+        for key in self.vertices:
+            neighbors = self.vertices[key].get_neighbors()
+            print(f"{key}: {list(neighbors)}")
+
+# Usage
+graph = Graph()
+graph.add_vertex('A')
+graph.add_vertex('B')
+graph.add_vertex('C')
+graph.add_edge('A', 'B', 1)
+graph.add_edge('B', 'C', 2)
+graph.add_edge('A', 'C', 3)
+
+graph.display_graph()
