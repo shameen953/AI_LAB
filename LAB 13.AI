@@ -1,0 +1,104 @@
+# TASK 1
+S = [
+    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 1, 1, 1, 1, 1, 1, 1],
+    [0, 1, 1, 0, 1, 1, 0, 1, 1, 1],
+    [0, 1, 0, 1, 1, 1, 0, 0, 1, 1],
+    [0, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+    [0, 0, 1, 0, 1, 1, 0, 1, 1, 1]
+]
+
+print("Initial Population S =", S)
+
+# Fitness Calculation
+def calfitness(S):
+    fit = []
+    total = 0
+    print("\nFitness Calculation:")
+    for i in S:
+        fitness = i.count(1)
+        fit.append(fitness)
+        total += fitness
+        print(f"Chromosome {i} -> Fitness: {fitness}")
+    print(f"Total Fitness: {total}")
+    return fit
+
+fit = calfitness(S)
+
+# Sorting Chromosomes by Fitness
+print("\nSorting Chromosomes by Fitness (Descending Order):")
+desc = sorted(S, key=lambda x: x.count(1), reverse=True)
+print("Sorted Population:", desc)
+
+# Crossover Operation
+print("\nPerforming Crossover after 2nd Point:")
+for i in range(3):
+    desc[0][i], desc[3][i] = desc[3][i], desc[0][i]
+    desc[4][i], desc[5][i] = desc[5][i], desc[4][i]
+print("Population After Crossover:")
+print("S1 =", desc[0], "S4 =", desc[3])
+print("S5 =", desc[4], "S6 =", desc[5])
+
+# Mutation
+print("\nPerforming Mutation:")
+for i in range(6):
+    for j in range(2):
+        desc[i][j] = 1 if desc[i][j] == 0 else 0
+print("Population After Mutation:", desc)
+
+fit2 = calfitness(desc)
+if sum(fit2) > sum(fit):
+    print("\nFitness improved after applying Genetic Algorithm.")
+else:
+    print("\nFitness decreased after applying Genetic Algorithm.")
+# TASK 2
+print("\nPerforming Crossover for S2 and S3 after the 4th Point:")
+for i in range(4, 10):
+    desc[1][i], desc[2][i] = desc[2][i], desc[1][i]
+print("Population After Crossover for S2 and S3:")
+print("S2 =", desc[1], "S3 =", desc[2])
+
+# Recalculate Fitness After New Crossover
+fit3 = calfitness(desc)
+if sum(fit3) > sum(fit2):
+    print("\nFitness improved after S2 and S3 crossover.")
+else:
+    print("\nFitness decreased after S2 and S3 crossover.")
+# TASK 3
+S = []
+print("\nEnter 6 chromosomes (10 binary values each):")
+for i in range(6):
+    chromosome = list(map(int, input(f"Enter chromosome {i + 1}: ").strip().split()))
+    S.append(chromosome)
+
+print("\nUser-Defined Initial Population S =", S)
+
+# Fitness Calculation
+fit = calfitness(S)
+
+# Sorting Chromosomes by Fitness
+print("\nSorting Chromosomes by Fitness (Descending Order):")
+desc = sorted(S, key=lambda x: x.count(1), reverse=True)
+print("Sorted Population:", desc)
+
+# Perform Crossover
+print("\nPerforming Crossover after 2nd Point:")
+for i in range(3):
+    desc[0][i], desc[3][i] = desc[3][i], desc[0][i]
+    desc[4][i], desc[5][i] = desc[5][i], desc[4][i]
+print("Population After Crossover:")
+print("S1 =", desc[0], "S4 =", desc[3])
+print("S5 =", desc[4], "S6 =", desc[5])
+
+# Perform Mutation
+print("\nPerforming Mutation:")
+for i in range(6):
+    for j in range(2):
+        desc[i][j] = 1 if desc[i][j] == 0 else 0
+print("Population After Mutation:", desc)
+
+fit2 = calfitness(desc)
+if sum(fit2) > sum(fit):
+    print("\nFitness improved after applying Genetic Algorithm.")
+else:
+    print("\nFitness decreased after applying Genetic Algorithm.")

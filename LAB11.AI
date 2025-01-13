@@ -1,0 +1,74 @@
+#TASK 1
+from collections import deque
+
+def bfs(graph, start, goal):
+    open_list = deque([start])  
+    closed_list = []  
+    while open_list:
+        current_node = open_list.popleft() 
+        closed_list.append(current_node)        
+        if current_node == goal:
+            break    
+        for neighbor in graph[current_node]:
+            if neighbor not in closed_list and neighbor not in open_list:
+                open_list.append(neighbor)
+    
+    return list(open_list), closed_list
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': ['G'],
+    'F': ['G'],
+    'G': []
+}
+start = 'A'
+goal = 'G'
+
+open_list, closed_list = bfs(graph, start, goal)
+
+print("BFS Results")
+print("Open List:", open_list)
+print("Closed List:", closed_list)
+
+#TASK 2
+start = input("Enter the start node: ").strip()
+goal = input("Enter the goal node: ").strip()
+
+open_list, closed_list = bfs(graph, start, goal)
+
+print("\nBFS with User Input")
+print("Open List:", open_list)
+print("Closed List:", closed_list)
+#TASK 3
+def dfs(graph, start, goal):
+    open_list = [start]  # Stack for DFS
+    closed_list = []
+    
+    while open_list:
+        current_node = open_list.pop()  # Pop from stack
+        closed_list.append(current_node)
+        
+        if current_node == goal:
+            break
+        
+        for neighbor in reversed(graph[current_node]):  # Reverse to maintain correct order
+            if neighbor not in closed_list and neighbor not in open_list:
+                open_list.append(neighbor)
+    
+    return open_list, closed_list
+
+open_list, closed_list = dfs(graph, start, goal)
+print("\nDFS Results")
+print("Open List:", open_list)
+print("Closed List:", closed_list)
+#TASK 4
+start = input("Enter the start node: ").strip()
+goal = input("Enter the goal node: ").strip()
+
+open_list, closed_list = dfs(graph, start, goal)
+
+print("\nDFS with User Input")
+print("Open List:", open_list)
+print("Closed List:", closed_list)
